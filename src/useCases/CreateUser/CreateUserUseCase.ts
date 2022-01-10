@@ -1,28 +1,38 @@
-import { client } from '../../../prisma/client';
+import { client } from "../../../prisma/client";
 import { hash } from "bcryptjs";
+import { GenerateToken } from "../../provider/GenerateToken";
+import { GenerateRefreshToken } from "../../provider/GenerateRefreshToken";
 
 interface ICreateUserRequest {
-    name: string;
-    username: string;
-    password: string;
+  name: string;
+  username: string;
+  password: string;
 }
 
 export class CreateUserUseCase {
   async execute({ name, username, password }: ICreateUserRequest) {
-
     // Verificar se o usuário existe
     const userAlreadyExists = await client.user.findFirst({
       where: { username },
     });
 
-    if (userAlreadyExists) throw new Error('User Already exists')
+    if (userAlreadyExists) throw new Error("User Already exists");
 
     // Cadastrar o usuário
-    const passwordHash = await hash(password, 8)
-    
-    const user = await client.user.create({ data: { name, username, password: passwordHash }});
+    const passwordHash = await hash(password, 8);
 
-    return user;
+    const user = await client.user.create({
+      data: { name, username, password: passwordHash },
+    });
 
+    const generateToken = new GenerateToken();
+
+    const token = generateToken.execute(user!.id);
+
+    const generateRefreshToken = new GenerateRefreshToken();
+
+    const refreshToken = await generateRefreshToken.execute(user!.id);
+
+    return { user, token, refreshToken };
   }
 }
