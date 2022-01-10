@@ -9,6 +9,6 @@ export class RefreshTokenUserController {
 
     const token = await refreshToken.execute(refresh_token);
 
-    return res.status(200).json(token);
+    return res.status(200).json({ token });
   }
 }
