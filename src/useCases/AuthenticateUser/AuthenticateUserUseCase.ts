@@ -20,7 +20,7 @@ export class AuthenticateUserUseCase {
 
     const token = sign({}, 'secretkey', {
         subject: user!.id,
-        expiresIn: '20s',
+        expiresIn: '1000s',
     })
 
     return token;
