@@ -1,7 +1,6 @@
 import { client } from "../../../prisma/client";
 import { hash } from "bcryptjs";
 import { GenerateToken } from "../../provider/GenerateToken";
-import { GenerateRefreshToken } from "../../provider/GenerateRefreshToken";
 
 interface ICreateUserRequest {
   name: string;
@@ -28,11 +27,7 @@ export class CreateUserUseCase {
     const generateToken = new GenerateToken();
 
     const token = generateToken.execute(user!.id);
-
-    const generateRefreshToken = new GenerateRefreshToken();
-
-    const refreshToken = await generateRefreshToken.execute(user!.id);
-
-    return { user, token, refreshToken };
+  
+    return { user, token };
   }
 }
